@@ -52,6 +52,8 @@ def main():
         result.append(boarding)
     print("Part1:", max([x.id for x in result]))
 
+    print("Part2:", sum(range(min([x.id for x in result]), max([x.id for x in result]) + 1)) - sum([x.id for x in result]))
+
 
 if __name__ == '__main__':
     main()
