@@ -22,6 +22,7 @@ class CustomCustoms():
     def find_anwers_pt1(self, group):
         self.answers = (len(set(group.replace("\n", ""))))
 
+
 def part2(input_path):
     return sum(
         [
