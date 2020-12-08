@@ -18,6 +18,7 @@ class HandheldHalting():
         self.instructions = None
         self.history = []
         self.accumulator = 0
+        self.booted = False
 
     def boot_computer(self):
         index = 0
@@ -31,18 +32,18 @@ class HandheldHalting():
             value = self.instructions[index][1]
             max_index = len(self.instructions) - 1
 
+            if index == max_index:
+                if instructions == 'acc':
+                    self.accumulator += value
+                self.booted = True
+                break
+
             if instructions == 'nop':
-                if index == max_index:
-                    index = 0
-                else:
-                    index += 1
+                index += 1
 
             if instructions == 'acc':
-                if index == max_index:
-                    index = 0
-                else:
-                    index += 1
-                    self.accumulator += value
+                index += 1
+                self.accumulator += value
 
             if instructions == 'jmp':
                 if value == max_index:
@@ -69,8 +70,33 @@ def main():
     handheld = HandheldHalting()
     handheld.instructions = input_file
     handheld.boot_computer()
-    print("Part1:", handheld.accumulator)
-    # print([x for x in input_file if x == ('nop', 0)])
+    print("Part1:", handheld.accumulator, handheld.booted)
+
+    # Part2
+    index = 0
+    temp_instructions = input_file
+    while index < len(input_file):
+        temp_instructions = input_file
+        if temp_instructions[index][0] == 'jmp':
+            temp_instructions[index] = ('nop', temp_instructions[index][1])
+            handheld = HandheldHalting()
+            handheld.instructions = temp_instructions
+            handheld.boot_computer()
+            if handheld.booted:
+                break
+            temp_instructions[index] = ('jmp', temp_instructions[index][1])
+
+        if temp_instructions[index][0] == 'nop':
+            temp_instructions[index] = ('jmp', temp_instructions[index][1])
+            handheld = HandheldHalting()
+            handheld.instructions = temp_instructions
+            handheld.boot_computer()
+            if handheld.booted:
+                break
+            temp_instructions[index] = ('nop', temp_instructions[index][1])
+
+        index += 1
+    print("Part2:", handheld.accumulator, handheld.booted)
 
 
 if __name__ == '__main__':
