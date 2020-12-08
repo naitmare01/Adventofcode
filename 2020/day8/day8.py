@@ -81,7 +81,7 @@ def main():
     wrong_values = {'jmp': 'nop', 'nop': 'jmp'}
     while index < len(input_file):
         handheld.reset()
-        if temp_instructions[index][0] == 'nop' or temp_instructions[index][0] == 'jmp':
+        if temp_instructions[index][0] in wrong_values:
             reset_value = ([x for x, y in wrong_values.items() if x == temp_instructions[index][0]][0])
             temp_instructions[index] = (wrong_values[temp_instructions[index][0]], temp_instructions[index][1])
             handheld.instructions = temp_instructions
