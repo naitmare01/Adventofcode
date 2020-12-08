@@ -15,10 +15,7 @@ def arguments():
 
 class HandheldHalting():
     def __init__(self):
-        self.instructions = None
-        self.history = []
-        self.accumulator = 0
-        self.booted = False
+        self.reset()
 
     def boot_computer(self):
         index = 0
@@ -58,6 +55,12 @@ class HandheldHalting():
                     elif (index + value) < max_index:
                         index += value
 
+    def reset(self):
+        self.instructions = None
+        self.history = []
+        self.accumulator = 0
+        self.booted = False
+
 
 def main():
     args = arguments()
@@ -75,26 +78,17 @@ def main():
     # Part2
     index = 0
     temp_instructions = input_file
+    wrong_values = {'jmp': 'nop', 'nop': 'jmp'}
     while index < len(input_file):
-        temp_instructions = input_file
-        if temp_instructions[index][0] == 'jmp':
-            temp_instructions[index] = ('nop', temp_instructions[index][1])
-            handheld = HandheldHalting()
+        handheld.reset()
+        if temp_instructions[index][0] == 'nop' or temp_instructions[index][0] == 'jmp':
+            reset_value = ([x for x, y in wrong_values.items() if x == temp_instructions[index][0]][0])
+            temp_instructions[index] = (wrong_values[temp_instructions[index][0]], temp_instructions[index][1])
             handheld.instructions = temp_instructions
             handheld.boot_computer()
             if handheld.booted:
                 break
-            temp_instructions[index] = ('jmp', temp_instructions[index][1])
-
-        if temp_instructions[index][0] == 'nop':
-            temp_instructions[index] = ('jmp', temp_instructions[index][1])
-            handheld = HandheldHalting()
-            handheld.instructions = temp_instructions
-            handheld.boot_computer()
-            if handheld.booted:
-                break
-            temp_instructions[index] = ('nop', temp_instructions[index][1])
-
+            temp_instructions[index] = (reset_value, temp_instructions[index][1])
         index += 1
     print("Part2:", handheld.accumulator, handheld.booted)
 
