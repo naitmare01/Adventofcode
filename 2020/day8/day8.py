@@ -17,6 +17,13 @@ class HandheldHalting():
     def __init__(self):
         self.reset()
 
+    def reset(self):
+        self.instructions = None
+        self.history = []
+        self.accumulator = 0
+        self.accumulator_booted = 0
+        self.booted = False
+
     def boot_computer(self):
         index = 0
         while True:
@@ -34,46 +41,25 @@ class HandheldHalting():
                     self.accumulator += value
                 self.booted = True
                 break
-
-            if instructions == 'nop':
-                index += 1
-
-            if instructions == 'acc':
-                index += 1
-                self.accumulator += value
-
-            if instructions == 'jmp':
-                if value == max_index:
-                    index -= 1
-                elif value > max_index:
-                    remainder = (value % max_index) - 1
-                    index += remainder
+            else:
+                if instructions in ('nop', 'acc'):
+                    index += 1
+                    if instructions == 'acc':
+                        self.accumulator += value
                 else:
-                    if (index + value) > max_index:
-                        difference = abs(max_index - (index + value)) - 1
-                        index = difference
-                    elif (index + value) < max_index:
-                        index += value
-
-    def reset(self):
-        self.instructions = None
-        self.history = []
-        self.accumulator = 0
-        self.booted = False
+                    index += value
 
 
 def main():
     args = arguments()
     with open(args.file) as file:
         input_file = file.read().strip()
-        input_file = input_file.splitlines()
-        input_file = [x.split(' ') for x in input_file]
-        input_file = [(x[0], int(x[1])) for x in input_file]
+        input_file = [(x[0], int(x[1])) for x in [x.split(' ') for x in input_file.splitlines()]]
 
     handheld = HandheldHalting()
     handheld.instructions = input_file
     handheld.boot_computer()
-    print("Part1:", handheld.accumulator, handheld.booted)
+    print("Part1:", handheld.accumulator)
 
     # Part2
     index = 0
@@ -88,9 +74,10 @@ def main():
             handheld.boot_computer()
             if handheld.booted:
                 break
-            temp_instructions[index] = (reset_value, temp_instructions[index][1])
+            else:
+                temp_instructions[index] = (reset_value, temp_instructions[index][1])
         index += 1
-    print("Part2:", handheld.accumulator, handheld.booted)
+    print("Part2:", handheld.accumulator)
 
 
 if __name__ == '__main__':
