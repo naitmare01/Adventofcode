@@ -3,8 +3,9 @@
 import argparse
 # from functools import lru_cache
 # from itertools import combinations
-# from copy import deepcopy
+from copy import deepcopy
 import time
+from collections import defaultdict
 
 
 def arguments():
@@ -23,26 +24,16 @@ class MemoryGame():
 
     def reset(self):
         self.instructions = None
-        self.spoken_numbers = []
+        self.last_number = None
 
-    def play_game(self):
-        for idx, num in enumerate(self.instructions):
-            self.spoken_numbers.append((idx + 1, num))
-        turn = len(self.instructions)
-        while turn < 2020:
-            turn += 1
-            last_number_spoken = self.spoken_numbers[-1][-1]
-            times_last_number_spoken = len([x[1] for x in self.spoken_numbers if x[1] == last_number_spoken])
-
-            if times_last_number_spoken == 1:
-                value = 0
-            else:
-                all_times_spoken = [x for x in self.spoken_numbers if x[1] == last_number_spoken]
-                last_index = all_times_spoken.pop()
-                second_to_last = all_times_spoken.pop()
-                value = last_index[0] - second_to_last[0]
-            self.spoken_numbers.append((turn, value))
-        
+    def play_game(self, max_turns):
+        hist = defaultdict(lambda: turn)
+        last = -1
+        for turn, number in enumerate(self.instructions):
+            hist[last], last = turn, int(number)
+        for turn in range(len(self.instructions), max_turns):
+            hist[last], last = turn, turn - hist[last]
+        self.last_number = last
 
 
 def main():
@@ -54,9 +45,13 @@ def main():
         input_file = [int(x) for x in input_file]
 
     game = MemoryGame()
-    game.instructions = input_file
-    game.play_game()
-    print("Part1:", game.spoken_numbers[-1][-1])
+    game.instructions = deepcopy(input_file)
+    game.play_game(2020)
+    print("Part1:", game.last_number)
+    game.reset()
+    game.instructions = deepcopy(input_file)
+    game.play_game(30000000)
+    print("Part2:", game.last_number)
     executionTime = (time.time() - startTime)
     print('Execution time in seconds: ' + str(executionTime))
 
