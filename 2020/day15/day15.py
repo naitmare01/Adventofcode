@@ -3,9 +3,8 @@
 import argparse
 # from functools import lru_cache
 # from itertools import combinations
-from copy import deepcopy
+# from copy import deepcopy
 import time
-from collections import defaultdict
 
 
 def arguments():
@@ -21,18 +20,18 @@ def arguments():
 class MemoryGame():
     def __init__(self):
         self.reset()
+        self.instructions = None
 
     def reset(self):
-        self.instructions = None
         self.last_number = None
+        self.history = dict()
 
     def play_game(self, max_turns):
-        hist = defaultdict(lambda: turn)
         last = -1
         for turn, number in enumerate(self.instructions):
-            hist[last], last = turn, int(number)
+            self.history[last], last = turn, number
         for turn in range(len(self.instructions), max_turns):
-            hist[last], last = turn, turn - hist[last]
+            self.history[last], last = turn, turn - self.history.get(last, turn)
         self.last_number = last
 
 
@@ -40,20 +39,17 @@ def main():
     startTime = time.time()
     args = arguments()
     with open(args.file) as file:
-        input_file = file.read()
-        input_file = input_file.split(',')
-        input_file = [int(x) for x in input_file]
+        input_file = [int(x) for x in file.read().split(',')]
 
     game = MemoryGame()
-    game.instructions = deepcopy(input_file)
+    game.instructions = input_file
     game.play_game(2020)
-    print("Part1:", game.last_number)
+    print(f'Part1: {game.last_number}')
     game.reset()
-    game.instructions = deepcopy(input_file)
     game.play_game(30000000)
-    print("Part2:", game.last_number)
+    print(f'Part2: {game.last_number}')
     executionTime = (time.time() - startTime)
-    print('Execution time in seconds: ' + str(executionTime))
+    print(f'Execution time in seconds: {executionTime}')
 
 
 if __name__ == '__main__':
