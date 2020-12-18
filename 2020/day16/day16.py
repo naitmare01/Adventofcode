@@ -24,8 +24,8 @@ class Ticket():
 
     def reset(self):
         self.extra_attr = dict()
-        self.valid_pt1 = False
         self.scanning_error = list()
+        self.valid_pt1 = False
 
     def set_extra_attr(self, attributes):
         for attr in attributes:
@@ -39,9 +39,13 @@ class Ticket():
                     tmp_valid.append(True)
                 else:
                     tmp_valid.append(False)
+                # for idx, cap in enumerate(plane.capacity[n]):
+                #    print(n, idx, (ticket in cap))
             if all(x is False for x in tmp_valid):
                 self.scanning_error.append(ticket)
                 self.extra_attr[n] = False
+        if len(self.scanning_error) == 0:
+            self.valid_pt1 = True
 
 
 class Plane():
@@ -80,6 +84,10 @@ def main():
         result.append(ticket)
     part1_result = sum([sum([y for y in x]) for x in [x.scanning_error for x in result]])
     print(f'Part1: {part1_result}')
+
+    part2 = [x for x in result if x.valid_pt1 is True]
+    col_input = list(zip(*[[int(y) for y in x.split(',')] for x in (input_file[2][1:])]))
+    print(col_input)
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 

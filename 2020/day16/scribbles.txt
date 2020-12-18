@@ -1,0 +1,58 @@
+[{'extra_attr': {'class': True, 'row': True, 'seat': True}, 
+'valid_pt1': False, 'scanning_error': [], 'instructions': [3, 9, 18]}, 
+
+{'extra_attr': {'class': True, 'row': True, 'seat': True}, 
+'valid_pt1': False, 'scanning_error': [], 'instructions': [15, 1, 5]}, 
+
+{'extra_attr': {'class': True, 'row': True, 'seat': True}, 
+'valid_pt1': False, 'scanning_error': [], 'instructions': [5, 14, 9]}]
+
+
+
+Using the valid ranges for each field, determine what order the fields appear on the tickets. 
+The order is consistent between all tickets: 
+
+if seat is the third field, it is the third field on every ticket, including your ticket.
+
+For example, suppose you have the following notes:
+
+
+####
+class: 0-1 or 4-19
+row: 0-5 or 8-19
+seat: 0-13 or 16-19
+
+your ticket:
+11,12,13
+
+nearby tickets:
+3,9,18
+15,1,5
+5,14,9
+Based on the nearby tickets in the above example, 
+
+- the first position must be row, 
+- the second position must be class, and 
+- the third position must be seat; 
+
+you can conclude that in your ticket, class is 12, row is 11, and seat is 13.
+
+Suduko!! 1 is matching, 0 is not matchning. Star is unique.
+###
+class[3]: 0, 1 -- [9] 0, 1 -- [18] 0, 1
+class[15]: 0, 1 -- [1] 1, 1 -- [5] 0, 1
+class[5]: 0, 1 -- [14] 0, 1 -- [9] 0, 1
+
+--
+row[3]: 1, 0 -- [9] 0, 1 -- [18] 0, 1
+row[15]: 0, 1 -- [1] 1, 1  -- [5] 1, 1
+row[5]: 1, 0 -- [14] 0, 1 -- [9] 0, 1
+
+--
+seat[3]: 1, 0 -- [9] 1, 0 -- [18] 0, 1
+seat[15]: 0, 1 -- [1] 1, 0  -- [5] 1, 0
+seat[5]: 0, 1 -- [14] 0, 0 -- [9] 1, 0
+
+--
+
+###
