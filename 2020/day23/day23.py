@@ -20,40 +20,62 @@ def arguments():
 class CrabCups():
     def __init__(self):
         self.reset()
+        self.circle = None
 
     def reset(self):
-        self.circle = None
-        self.rounds = 100
-        self.current_cup = None
-        self.current_cup_idx = None
+        self.rounds = None
         self.destination_cup = None
-        self.destination_cup_idx = None
         self.result = None
 
-    def play_game(self):
-        cups = deepcopy(self.circle)
-        self.current_cup = None
+    def play_game(self, part):
+        if part == 2:
+            cups = deepcopy(self.circle) + [i for i in range(len(self.circle) + 1, 1000001)]
+        elif part == 1:
+            cups = deepcopy(self.circle) + [i for i in range(len(self.circle) + 1, 10)]
         cups_len = len(cups)
 
-        for i in range(self.rounds):
-            self.current_cup_idx = (cups.index(self.current_cup) + 1) % cups_len if self.current_cup else 0
-            self.current_cup = cups[self.current_cup_idx]
+        node_map = {}
+        previous_node = None
+        for cup in cups:
+            node = Node(cup)
+            node_map[cup] = node
+            if previous_node:
+                previous_node.right = node
+            previous_node = node
+        previous_node.right = node_map[cups[0]]
 
-            picked_up = []
-            for j in range(3):
-                picked_up.append(cups[(self.current_cup_idx + j + 1) % cups_len])
-            for p in picked_up:
-                cups.remove(p)
+        current_node = None
+        for n in range(self.rounds):
+            current_node = current_node.right if current_node else node_map[cups[0]]
 
-            self.destination_cup = self.current_cup - 1 or cups_len
-            while self.destination_cup in picked_up:
-                self.destination_cup = self.destination_cup - 1 or cups_len
-            self.destination_cup_idx = cups.index(self.destination_cup)
+            picked_up = [current_node.right, current_node.right.right, current_node.right.right.right]
+            current_node.right = picked_up[-1].right
 
-            cups = cups[: self.destination_cup_idx + 1] + picked_up + cups[self.destination_cup_idx + 1:]
-        ix_1 = cups.index(1)
-        self.result = cups[ix_1 + 1:] + cups[:ix_1]
-        self.result = ''.join(str(x) for x in self.result)
+            d_value = current_node.value - 1 or cups_len
+            while node_map[d_value] in picked_up:
+                d_value = d_value - 1 or cups_len
+            self.destination_cup = node_map[d_value]
+
+            picked_up[-1].right = self.destination_cup.right
+            self.destination_cup.right = picked_up[0]
+
+        if part == 1:
+            idx = 1
+            n = node_map[1]
+            tmp_result = []
+            while idx < len(node_map):
+                tmp_result.append(n.right.value)
+                n = n.right
+                idx += 1
+            self.result = ''.join(str(x) for x in tmp_result)
+        elif part == 2:
+            self.result = node_map[1].right.value * node_map[1].right.right.value
+
+
+class Node():
+    def __init__(self, value, right=None):
+        self.value = value
+        self.ref = right
 
 
 def main():
@@ -64,8 +86,15 @@ def main():
     crabcups = CrabCups()
     crabcups.circle = input_file
     crabcups.rounds = 100
-    crabcups.play_game()
+    crabcups.play_game(1)
     print(f'Part1: {crabcups.result}')
+
+    crabcups.reset()
+    crabcups.circle = input_file
+    crabcups.rounds = 10000000
+    crabcups.play_game(2)
+    print(f'Part2: {crabcups.result}')
+
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
