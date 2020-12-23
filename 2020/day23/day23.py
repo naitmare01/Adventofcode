@@ -56,18 +56,6 @@ class CrabCups():
         self.result = ''.join(str(x) for x in self.result)
 
 
-def prep(input,maximum):
-    ring = [input[0]] + ([0] * len(input))
-    for x in range(len(input)):
-        ring[input[x]] = input[x+1] if x+1 < len(input) else max(input)+1
-    for x in range(max(input)+1,maximum):
-        ring.append(x+1)
-    ring.append(ring[0])
-    ring.append(maximum)
-    ring.append(min(input))
-    return ring
-
-
 def main():
     startTime = time.time()
     args = arguments()
@@ -78,7 +66,6 @@ def main():
     crabcups.rounds = 100
     crabcups.play_game()
     print(f'Part1: {crabcups.result}')
-    print(prep(input_file, 10))
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
