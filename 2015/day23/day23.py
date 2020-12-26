@@ -64,6 +64,10 @@ def main():
     vm.instructions = input_file
     vm.write_memory()
     print(f'Part1: {vm.memory["b"]}')
+    vm.reset()
+    vm.memory['a'] = 1
+    vm.write_memory()
+    print(f'Part2: {vm.memory["b"]}')
 
 
 if __name__ == '__main__':
