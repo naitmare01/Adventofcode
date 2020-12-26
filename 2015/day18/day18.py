@@ -22,6 +22,7 @@ class Board():
     def reset(self):
         self.grid = None
         self.living = set()
+        self.alwayson = set()
 
     def find_living_cells(self):
         for rowidx, x in enumerate(self.grid):
@@ -30,6 +31,15 @@ class Board():
                     self.living.add((rowidx, colidx))
         self.max_x = len(self.grid) - 1
         self.max_y = len(self.grid[0]) - 1
+
+    def set_always_on(self):
+        self.alwayson.add((self.max_x, self.max_x))  # Corners always on.
+        self.alwayson.add((self.max_x, 0))  # Corners always on.
+        self.alwayson.add((0, 0))  # Corners always on.
+        self.alwayson.add((0, self.max_x))  # Corners always on.
+
+        for n in self.alwayson:
+            self.living.add((n))
 
     def check_neighbour(self, cell):
         x, y = cell
@@ -45,6 +55,8 @@ class Board():
     def apply_iteration(self, board):
         new_board = set([])
         candidates = board.union(set(n for cell in board for n in self.check_neighbour(cell)))
+        for n in self.alwayson:
+            new_board.add(n)
         for cell in candidates:
             x, y = cell
             if x > self.max_x or x < 0:
@@ -71,6 +83,15 @@ def main():
     for _ in range(number_of_iterations):
         board.apply_iteration(board.living)
     print(f'Part1: {len(board.living)}')
+
+    board = Board()
+    board.grid = input_file
+    board.find_living_cells()
+    board.set_always_on()
+    number_of_iterations = 100
+    for _ in range(number_of_iterations):
+        board.apply_iteration(board.living)
+    print(f'Part2: {len(board.living)}')
 
 
 if __name__ == '__main__':
