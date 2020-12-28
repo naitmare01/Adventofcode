@@ -1,6 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import argparse
+# from functools import lru_cache
+# from itertools import permutations
+# from copy import deepcopy
+import time
 
 
 def arguments():
@@ -13,37 +17,56 @@ def arguments():
     return args
 
 
-class Elf():
+class ElfGame():
     def __init__(self):
-        self.Id = None
+        self.reset()
+        self.instructions = None
+        self.node_map = {}
+
+    def reset(self):
+        return
+
+    def setup_cirlce(self):
+        previous_node = None
+        for cup in self.instructions:
+            node = Node(cup)
+            self.node_map[cup] = node
+            if previous_node:
+                previous_node.right = node
+            previous_node = node
+        previous_node.right = self.node_map[self.instructions[0]]
+
+    def play_game(self):
+        current_elf = self.node_map.keys()
+        current_elf = next(iter(self.node_map))
+        current_elf = self.node_map[current_elf]
+        while len(self.node_map) > 1:
+            elf_to_remove = current_elf.right
+            new_neighbour = elf_to_remove.right
+            current_elf.right = new_neighbour
+            current_elf = new_neighbour
+            del self.node_map[elf_to_remove.value]
+
+class Node():
+    def __init__(self, value, right=None):
+        self.value = value
+        self.ref = right
 
 
 def main():
+    startTime = time.time()
     args = arguments()
-
     with open(args.file) as file:
-        input_file = file.read().strip()
-    list_of_elves = [x for x in range(int(input_file))]
-    list_of_elves = [1] * (len(list_of_elves))
+        input_file = int(file.read())
+        input_file = [x for x in range(input_file + 1) if x != 0]
+    elfgame = ElfGame()
+    elfgame.instructions = input_file
+    elfgame.setup_cirlce()
+    elfgame.play_game()
+    result = [k for k in elfgame.node_map.keys()][0]
+    print(f'Part1: {result}')
 
-    current_index = 0
-    while True:
-        if len([x for x in list_of_elves if x != 0]) == 1:
-            break
-        if current_index > (len(list_of_elves) - 1):
-            current_index = 0
-        if list_of_elves[current_index] == 0:
-            current_index += 1
-            continue
-        indexes = [i for i, x in enumerate(list_of_elves) if x >= 1 and i != current_index]
-
-        if len(indexes) >= 1:
-            absolute_difference_function = lambda list_value: abs(list_value - current_index)
-            closest_value = min(indexes, key=absolute_difference_function)
-            list_of_elves[current_index] += list_of_elves[closest_value]
-            list_of_elves[closest_value] = 0
-        current_index += 1
-        print(list_of_elves)
+    print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
 if __name__ == '__main__':
