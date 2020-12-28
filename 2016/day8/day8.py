@@ -60,6 +60,7 @@ def main():
     grid.instructions = input_file
     grid.run_program()
     print(f'Part1: {grid.number_of_lit_pixels}')
+    print(f'Part2: exportera till excel, notepad etc {grid.screen}')
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
