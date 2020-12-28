@@ -90,8 +90,12 @@ def main():
     marble.setup_cirlce()
     marble.play_game()
     print(f'Part1: {max(marble.player_score.values())}')
-    # for k, v in marble.node_map.items():
-    #    print("Left", v.left.value, "middle", k, "Right", v.right.value)
+    marble.reset()
+    marble.num_players = int(input_file[0])
+    marble.last_marble = int(input_file[6]) * 100
+    marble.setup_cirlce()
+    marble.play_game()
+    print(f'Part2: {max(marble.player_score.values())}')
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
