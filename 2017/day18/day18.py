@@ -1,6 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import argparse
+# from functools import lru_cache
+# from itertools import permutations
+# from copy import deepcopy
+import time
+# import networkx as nx
+# import collections
+
 
 def arguments():
     # Handle command line arguments
@@ -11,78 +18,95 @@ def arguments():
 
     return args
 
-def represents_int(string_to_test):
-    try:
-        int(string_to_test)
-        return True
-    except ValueError:
-        return False
 
-class Duet: # pylint: disable=too-few-public-methods, too-many-instance-attributes
-    '''
-        snd X plays a sound with a frequency equal to the value of X.
-        set X Y sets register X to the value of Y.
-        add X Y increases register X by the value of Y.
-        mul X Y sets register X to the result of multiplying the value contained in register X by the value of Y.
-        mod X Y sets register X to the remainder of dividing the value contained in register X by the value of Y (that is, it sets X to the result of X modulo Y).
-        rcv X recovers the frequency of the last sound played, but only when the value of X is not zero. (If it is zero, the command does nothing.)
-        jgz X Y jumps with an offset of the value of Y, but only if the value of X is greater than zero. (An offset of 2 skips the next instruction, an offset of -1 jumps to the previous instruction, and so on.)
-    '''
+class VM():
     def __init__(self):
-        self.registrer = []
-        self.sound_freq = 0
+        self.reset()
+        self.instructions = None
 
-    def run_instructions(self, instructions):
+    def reset(self):
+        self.memory = dict()
+        self.last_sound = None
+        self.recoved_frequency = None
+
+    def is_digit(self, n):
+        try:
+            int(n)
+            return True
+        except ValueError:
+            return False
+
+    def run_vm(self):
         idx = 0
         while True:
-            instruction = instructions[idx]
-            instruction = instruction.split(" ")
-            operation = instruction[0]
-            registrar = instruction[1]
-            register_exist = [x for x in self.registrer if x[0] == registrar]
+            cmd = self.instructions[idx]
+            inst = cmd[0]
+            first_registrer = cmd[1]
+            jump = 1
 
-            if not register_exist:
-                self.registrer.append((registrar, 0))
-            index_of_registrar = [self.registrer.index(x) for x in self.registrer if x[0] == registrar][0]
+            if first_registrer not in self.memory and first_registrer.isalpha():
+                self.memory[first_registrer] = 0
+            if len(cmd) > 2:
+                second_registrer = cmd[2]
+                if second_registrer not in self.memory and second_registrer.isalpha():
+                    self.memory[second_registrer] = 0
 
-            if operation == "snd":
-                self.sound_freq = self.registrer[index_of_registrar][1]
-            elif operation == "set":
-                set_value = int(instruction[2])
-                self.registrer[index_of_registrar] = (registrar, set_value)
-            elif operation == "add":
-                add_value = self.registrer[index_of_registrar][1] + int(instruction[2])
-                self.registrer[index_of_registrar] = (registrar, add_value)
-            elif operation == "mul":
-                mul_value = self.registrer[index_of_registrar][1] * self.registrer[index_of_registrar][1]
-                self.registrer[index_of_registrar] = (registrar, mul_value)
-            elif operation == "mod":
-                if represents_int(instruction[2]):
-                    mod_value = self.registrer[index_of_registrar][1] % int(instruction[2])
+            if inst == 'set':
+                if self.is_digit(second_registrer):
+                    value = int(second_registrer)
                 else:
-                    index_of_registrar_instruction = [self.registrer.index(x) for x in self.registrer if x[0] == instruction[2]][0]
-                    print(self.registrer[index_of_registrar][1], self.registrer[index_of_registrar_instruction][1], self.registrer)
-                mod_value = self.registrer[index_of_registrar][1] % self.registrer[index_of_registrar_instruction][1]
-                self.registrer[index_of_registrar] = (registrar, mod_value)
-            elif operation == "rcv":
-                if self.registrer[index_of_registrar][1] != 0:
-                    print("exit loop")
+                    value = self.memory[second_registrer]
+                self.memory[first_registrer] = value
+            elif inst == 'snd':
+                self.last_sound = int(self.memory[first_registrer])
+            elif inst == 'add':
+                if self.is_digit(second_registrer):
+                    value = int(second_registrer)
+                else:
+                    value = self.memory[second_registrer]
+                self.memory[first_registrer] += value
+            elif inst == 'mul':
+                if self.is_digit(second_registrer):
+                    value = int(second_registrer)
+                else:
+                    value = self.memory[second_registrer]
+                self.memory[first_registrer] *= value
+            elif inst == 'mod':
+                if self.is_digit(second_registrer):
+                    value = int(second_registrer)
+                else:
+                    value = self.memory[second_registrer]
+                self.memory[first_registrer] = self.memory[first_registrer] % value
+            elif inst == 'jgz':
+                jumping = False
+                if self.is_digit(first_registrer):
+                    if int(first_registrer) > 0:
+                        jumping = True
+                elif self.memory[first_registrer] > 0:
+                    jumping = True
+                if jumping:
+                    if self.is_digit(second_registrer):
+                        jump = int(second_registrer)
+                    else:
+                        jump = self.memory[second_registrer]
+            elif inst == 'rcv':
+                if self.memory[first_registrer] != 0:
+                    self.recoved_frequency = self.last_sound
                     break
-            elif operation == "jgz":
-                if self.registrer[index_of_registrar][1] > 0:
-                    idx = idx + int(instruction[2])
-                    continue
-            idx = idx + 1
+            idx += jump
+
 
 def main():
+    startTime = time.time()
     args = arguments()
-
     with open(args.file) as file:
-        input_file = file.read().strip().split("\n")
-
-    duet = Duet()
-    duet.run_instructions(input_file)
-    print(duet.registrer, duet.sound_freq)
+        input_file = file.read().splitlines()
+        input_file = [x.split() for x in input_file]
+    vm = VM()
+    vm.instructions = input_file
+    vm.run_vm()
+    print(f'Part1: {vm.recoved_frequency}')
+    print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
 if __name__ == '__main__':
