@@ -47,6 +47,7 @@ class ElfGame():
             current_elf = new_neighbour
             del self.node_map[elf_to_remove.value]
 
+
 class Node():
     def __init__(self, value, right=None):
         self.value = value

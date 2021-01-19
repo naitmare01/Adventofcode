@@ -45,15 +45,7 @@ class MarbleMania():
         idx = 1
         while True:
             for player in range(self.num_players):
-                if idx % 23 != 0:
-                    new_current = Node(idx)
-                    node_before = current_node.right
-                    node_after = current_node.right.right
-                    new_current.right = node_after
-                    new_current.left = node_before
-                    node_after.left = new_current
-                    node_before.right = new_current
-                elif idx % 23 == 0:
+                if idx % 23 == 0:
                     self.score_points((player + 1), idx)
                     marble_to_remove = new_current.left.left.left.left.left.left.left
                     self.score_points((player + 1), marble_to_remove.value)
@@ -61,6 +53,14 @@ class MarbleMania():
                     new_current.left = marble_to_remove.left
                     new_current.left.right = new_current
                     del self.node_map[marble_to_remove.value]
+                else:
+                    new_current = Node(idx)
+                    node_before = current_node.right
+                    node_after = current_node.right.right
+                    new_current.right = node_after
+                    new_current.left = node_before
+                    node_after.left = new_current
+                    node_before.right = new_current
 
                 self.node_map[new_current.value] = new_current
                 current_node = new_current
