@@ -61,6 +61,12 @@ def main():
     dragon_checksum.calculate_checksum()
     print(f'Part1: {dragon_checksum.check_sum}')
 
+    dragon_checksum.reset()
+    dragon_checksum.disk_size = 35651584
+    dragon_checksum.fill_disk()
+    dragon_checksum.calculate_checksum()
+    print(f'Part2: {dragon_checksum.check_sum}')
+
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
