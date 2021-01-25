@@ -21,11 +21,10 @@ def arguments():
 class Rouge():
     def __init__(self):
         self.reset()
-        self.instructions = []
         self.cols = 0
 
     def reset(self):
-        return
+        self.instructions = []
 
     def find_next_row(self, x):
         new_row = list()
@@ -72,11 +71,17 @@ def main():
     rouge = Rouge()
     rouge.cols = len(input_file)
     rouge.instructions.append(input_file)
-    for n in range(39):
+    for n in range(39):  # one less then required cause loops starts at zero
         rouge.find_next_row(n + 1)
-
     part1_result = (sum([len([y for y in x if y == '.']) for x in rouge.instructions]))
     print(f'Part1: {part1_result}')
+
+    rouge.reset()
+    rouge.instructions.append(input_file)
+    for n in range(399999):  # one less then required cause loops starts at zero
+        rouge.find_next_row(n + 1)
+    part2_result = (sum([len([y for y in x if y == '.']) for x in rouge.instructions]))
+    print(f'Part2: {part2_result}')
     print(f'Execution time in seconds: {(time.time() - startTime)}')
 
 
