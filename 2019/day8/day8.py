@@ -3,6 +3,7 @@
 from __future__ import print_function
 import argparse
 
+
 class Layer:
     def __init__(self, name):
         self.name = name
@@ -35,9 +36,11 @@ def arguments():
 
     return args
 
+
 def split_n_char(string_to_convert, n_characther):
-    result = [string_to_convert[i:i+n_characther] for i in range(0, len(string_to_convert), n_characther)]
+    result = [string_to_convert[i:i + n_characther] for i in range(0, len(string_to_convert), n_characther)]
     return result
+
 
 def create_layer_object(layers):
     part1_result = []
@@ -48,18 +51,21 @@ def create_layer_object(layers):
         part1_result.append(layer_class)
     return part1_result
 
+
 def find_smallest_number_of_zeroes(layers):
     sorted_list = sorted(layers, key=lambda x: x.number_of_zeroes, reverse=False)
     return sorted_list[0]
 
+
 def calculate_corruption(layer):
-    #count number of ones and twos.
+    # count number of ones and twos.
     layer.count_number_of_ones()
     layer.count_number_of_twos()
 
     checksum = layer.number_of_ones * layer.number_of_twos
 
     return checksum
+
 
 def main():
     args = arguments()
@@ -70,7 +76,7 @@ def main():
     part1 = create_layer_object(layers)
     part1smallest = find_smallest_number_of_zeroes(part1)
     part1checksum = calculate_corruption(part1smallest)
-    print("Part1:", part1checksum) #Part 1
+    print("Part1:", part1checksum)  # Part 1
 
     for part in part1:
         print(part.numbers)
@@ -79,10 +85,11 @@ def main():
                 print(" ")
             elif num == "1":
                 print("X")
-            #print(color)
+            # print(color)
+
 
 if __name__ == '__main__':
     main()
 
-#Part 2
-#Svart(0) || vit(1) > transparent(2)
+# Part 2
+# Svart(0) || vit(1) > transparent(2)

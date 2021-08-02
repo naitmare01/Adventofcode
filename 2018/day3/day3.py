@@ -3,6 +3,7 @@
 import argparse
 import collections
 
+
 def arguments():
     # Handle command line arguments
     parser = argparse.ArgumentParser(description='Adventofcode.')
@@ -12,7 +13,8 @@ def arguments():
 
     return args
 
-class Claim: # pylint: disable=too-few-public-methods, too-many-instance-attributes
+
+class Claim:  # pylint: disable=too-few-public-methods, too-many-instance-attributes
     def __init__(self):
         self.claim_id = None
         self.starting_x = None
@@ -29,8 +31,8 @@ class Claim: # pylint: disable=too-few-public-methods, too-many-instance-attribu
 
         area_x = claim.split()[3].split('x')[0]
         area_y = claim.split()[3].split('x')[1]
-        ending_x = self.starting_x + (int(area_x) -1)
-        ending_y = self.starting_y + (int(area_y) -1)
+        ending_x = self.starting_x + (int(area_x) - 1)
+        ending_y = self.starting_y + (int(area_y) - 1)
 
         self.ending_x = ending_x
         self.ending_y = ending_y
@@ -43,20 +45,18 @@ class Claim: # pylint: disable=too-few-public-methods, too-many-instance-attribu
 
         self.claim_area = area
 
-class MapMatrix: # pylint: disable=too-few-public-methods
+
+class MapMatrix:  # pylint: disable=too-few-public-methods
     def __init__(self):
         self.land = []
 
     def claim_land(self, cordinations):
-        state = any(x in list(cordinations) for x in self.land)
-        print(list(cordinations))
-        if state:
-            print(state)
         self.land.append(cordinations)
-        #print(self.land)
+
 
 def find_overlapping_fabric(total_area):
     return [item for item, count in collections.Counter(total_area).items() if count > 1]
+
 
 def main():
     args = arguments()
