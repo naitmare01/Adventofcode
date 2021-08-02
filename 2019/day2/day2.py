@@ -19,8 +19,10 @@ class computer():
 
     def reset(self):
         self.instructions = None
+        self.noun_verb_range = 100
+        self.wanted = None
 
-    def compute(self):
+    def compute(self, part2):
         for index in range(0, len(self.instructions), 4):
             operator = self.instructions[index]
 
@@ -37,18 +39,32 @@ class computer():
 
                 self.instructions[self.instructions[index + 3]] = new_result
 
+                if part2:
+                    if self.instructions[0] == self.wanted:
+                        return True
+
 
 def main():
     args = arguments()
 
     with open(args.file) as file:
         file = list(file.read().split(','))
-        input_file = map(int, file)
+        input_file = [int(x) for x in file]
     intcode_computer = computer()
     intcode_computer.instructions = list(input_file)
-    intcode_computer.compute()
+    intcode_computer.compute(False)
     part1_answer = intcode_computer.instructions[0]
     print("Part1:", part1_answer)
+
+    for noun in range(100):
+        for verb in range(100):
+            intcode_computer.reset()
+            intcode_computer.wanted = 19690720
+            intcode_computer.instructions = list(input_file)
+            intcode_computer.instructions[1] = noun
+            intcode_computer.instructions[2] = verb
+            if intcode_computer.compute(True):
+                print("Part2:", 100 * noun + verb)
 
 
 if __name__ == '__main__':
