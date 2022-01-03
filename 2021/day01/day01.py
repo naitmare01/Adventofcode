@@ -40,7 +40,7 @@ def main():
             new_number = sum(input_file[index:index+3])
             pt2list.append(new_number)
         except IndexError:
-            test = 'null'
+            continue
 
     part2 = test_increase(pt2list)
     print("Part2:", part2)
