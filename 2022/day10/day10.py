@@ -21,12 +21,15 @@ class Computer:
         self.register = {"x": 1}
         self.history = {}
         self.signal_strengths = []
-        # Memory during, commit after?
+        self.crt = ["." for i in range(240)]
+        self.crt_pos = 0
+        self.crt_row = 0
 
     def process(self, instruction):
         '''process'''
         if instruction == "noop":
             self.cycles += 1
+            self.draw_crt()
             self.history[self.cycles] = self.register["x"]
         if instruction.startswith("addx"):
             self.addx_cycle(instruction)
@@ -35,11 +38,23 @@ class Computer:
         '''Addx'''
         for i in range(2):
             self.cycles += 1
+            self.draw_crt()
             if i == 0:
                 self.history[self.cycles] = self.register["x"]
             else:
                 self.history[self.cycles] = self.register["x"]
         self.register["x"] += int(instruction.split()[-1])
+
+    def draw_crt(self):
+        '''Draw Crt'''
+        neighbors = self.register["x"] + 1, self.register["x"] - 1, self.register["x"]
+        if self.crt_pos in neighbors:
+            self.crt[(self.crt_pos + self.crt_row * 40)] = "#"
+
+        self.crt_pos += 1
+        if self.crt_pos % 40 == 0:
+            self.crt_pos = 0
+            self.crt_row += 1
 
     def calculate_signal_strength(self, cycles):
         '''Calc pt1'''
@@ -63,6 +78,10 @@ def main():
     comp.calculate_signal_strength([20, 60, 100, 140, 180, 220])
     result_pt1 = sum(comp.signal_strengths)
     print("Part1:", result_pt1)
+    print("Part2:")
+    crt_rows_display = comp.crt[:40], comp.crt[40:80], comp.crt[80:120], comp.crt[120:160], comp.crt[160:200], comp.crt[200:240]
+    for row in crt_rows_display:
+        print(" ".join(row))
 
 if __name__ == '__main__':
     main()
