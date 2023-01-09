@@ -24,12 +24,17 @@ class Monkey:
         self.throw_true_monkey = None
         self.throw_false_monkey = None
         self.inspected_items = 0
+        self.divisor_product = None
 
-    def test_worry_level(self, all_monkeys):
+    def test_worry_level(self, all_monkeys, pt2, divisor_product=None):
         '''Test'''
         for i in self.items:
             self.inspected_items += 1
-            worry_level = int(eval(self.worry_operation.replace('old', i)) / 3)
+            if pt2:
+                item_reduce = int(i) % divisor_product
+                worry_level = eval(self.worry_operation.replace('old', str(item_reduce)))
+            else:
+                worry_level = int(eval(self.worry_operation.replace('old', i)) / 3)
 
             if worry_level % self.test_divisible == 0:
                 throw_to = self.throw_true_monkey
@@ -71,10 +76,29 @@ def main():
         monk.throw_false_monkey = parsed_monkey[5]
     num_rounds = 20
     for _ in range(num_rounds):
-        _ = [x.test_worry_level(all_monkeys) for x in all_monkeys]
+        _ = [x.test_worry_level(all_monkeys, False) for x in all_monkeys]
     result_pt1 = ([(x.inspected_items) for x in all_monkeys])
     result_pt1 = (sorted(result_pt1, reverse=True)[:2])
     print("Part1:", numpy.prod(result_pt1))
+
+    all_monkeys = []
+    for monkey in input_file:
+        parsed_monkey = parse_input(monkey)
+        monk = Monkey()
+        all_monkeys.append(monk)
+        monk.id = parsed_monkey[0]
+        monk.items = parsed_monkey[1]
+        monk.worry_operation = parsed_monkey[2]
+        monk.test_divisible = parsed_monkey[3]
+        monk.throw_true_monkey = parsed_monkey[4]
+        monk.throw_false_monkey = parsed_monkey[5]
+    divisor_product = numpy.prod([x.test_divisible for x in all_monkeys])
+    num_rounds = 10000
+    for _ in range(num_rounds):
+        _ = [x.test_worry_level(all_monkeys, True, divisor_product) for x in all_monkeys]
+    result_pt2 = ([(x.inspected_items) for x in all_monkeys])
+    result_pt2 = (sorted(result_pt2, reverse=True)[:2])
+    print("Part2:", numpy.prod(result_pt2))
 
 
 if __name__ == '__main__':
