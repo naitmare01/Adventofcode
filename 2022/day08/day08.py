@@ -1,45 +1,44 @@
+import numpy as np
 
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-import argparse
+with open('input', 'r') as f:
+    lines = f.readlines()
+    lines = [entry.strip() for entry in lines]
+
+trees = np.zeros((len(lines), len(lines[0])), dtype=int)
+for i, line in enumerate(lines):
+    trees[i, :] = np.array(list(line))
+
+# the edges are always visible
+visible_trees = 2*len(lines[0]) + 2 *(len(lines)-2)
+
+# iterate over trees
+for i in range(1, trees.shape[0]-1):
+    for j in range(1, trees.shape[1]-1):
+        tree_column = trees[:, j] - trees[i, j]
+        tree_row = trees[i, :] - trees[i, j]
+        routes = [tree_row[:j], tree_row[j+1:], tree_column[:i], tree_column[i+1:]]
+        if sum(list(map(lambda route: (route<0).all(), routes))) > 0:
+            visible_trees += 1
+
+print(visible_trees)
 
 
-def arguments():
-    '''args'''
-    # Handle command line arguments
-    parser = argparse.ArgumentParser(description='Adventofcode.')
-    parser.add_argument('-f', '--file', required=True)
+scenic_scores = np.zeros((len(lines), len(lines[0])), dtype=int)
 
-    args = parser.parse_args()
+def compute_scenic_score(route):
+    big_trees_array = list(route >= 0)
+    if True in big_trees_array:
+        return big_trees_array.index(True) + 1
+    else:
+        return len(big_trees_array)
 
-    return args
+# iterate over trees
+for i in range(1, trees.shape[0]-1):
+    for j in range(1, trees.shape[1]-1):
+        tree_column = trees[:, j] - trees[i, j]
+        tree_row = trees[i, :] - trees[i, j]
+        # left, right, up, down
+        routes = [tree_row[j-1::-1], tree_row[j+1:], tree_column[i-1::-1], tree_column[i+1:]]
+        scenic_scores[i,j] = np.prod(list(map(compute_scenic_score, routes)))
 
-
-def convert_1d_to_2d(l, cols):
-    '''Matrix'''
-    return [l[i:i + cols] for i in range(0, len(l), cols)]
-
-
-def main():
-    '''Main'''
-    args = arguments()
-    with open(args.file, encoding="utf8") as file:
-        input_file = file.read().strip()
-        input_file = input_file.splitlines()
-    trees = {}
-    for row_idx, row in enumerate(input_file):
-        for col_idx, col in enumerate(row):
-            if (row_idx - 1) == -1 or (col_idx -1 == -1):
-                trees[row_idx, col_idx] = "True" # Edges
-            else:
-                try:
-                    _ = input_file[row_idx + 1][col_idx + 1]
-                    print("Pos:", row_idx, col_idx, "Value:", input_file[row_idx][col_idx])
-                    for i in reversed(range(row_idx)): # Looking up
-                        print(i)
-                except IndexError:
-                    trees[row_idx, col_idx] = "True" # Edges
-    print(trees.__dir__)
-
-if __name__ == '__main__':
-    main()
+print(np.max(scenic_scores))
